@@ -1,0 +1,96 @@
+name: "Build and publish all"
+
+on:
+  workflow_dispatch:
+    inputs:
+
+jobs:
+
+  centos7:
+    if: false
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      context: centos7
+      name: ${{ github.repository }}/centos7
+
+  centos7-pkgsrc-bootstrapped:
+    if: false
+    needs: centos7
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      context: centos7-pkgsrc-bootstrapped
+      name: ${{ github.repository }}/centos7-pkgsrc-bootstrapped
+      build_args: |
+        github_repository=${{ github.repository }}
+
+  centos7-pkgsrc:
+    if: false
+    needs: centos7-pkgsrc-bootstrapped
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        #pkgsrc_branch: ["trunk", "2024q2"]
+        pkgsrc_branch: ["trunk"]
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      context: centos7-pkgsrc
+      name: ${{ github.repository }}/centos7-pkgsrc-${{ matrix.pkgsrc_branch }}
+      build_args: |
+        github_repository=${{ github.repository }}
+        pkgsrc_branch=${{ matrix.pkgsrc_branch}}
+
+  centos7-pkgsrc-fix-stdcxx:
+    if: false
+    needs: centos7-pkgsrc
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        #pkgsrc_branch: ["trunk", "2024q2"]
+        pkgsrc_branch: ["trunk"]
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      context: centos7-pkgsrc-fix-stdcxx
+      name: ${{ github.repository }}/centos7-pkgsrc-${{ matrix.pkgsrc_branch }}-fix-stdcxx
+      build_args: |
+        github_repository=${{ github.repository }}
+        pkgsrc_branch=${{ matrix.pkgsrc_branch}}
+
+  centos7-qt5sdk:
+    #needs: centos7-pkgsrc-fix-stdcxx
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        #pkgsrc_branch: ["trunk", "2024q2"]
+        pkgsrc_branch: ["trunk"]
+    uses: ./.github/workflows/build_and_publish.yml
+    with:
+      context: centos7-qt5sdk
+      name: ${{ github.repository }}/centos7-qt5sdk-${{ matrix.pkgsrc_branch }}
+      build_args: |
+        github_repository=${{ github.repository }}
+        pkgsrc_branch=${{ matrix.pkgsrc_branch}}

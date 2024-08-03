@@ -1,0 +1,18 @@
+diff -p -u -r1.39 Makefile
+--- audio/openal-soft/Makefile	30 Jan 2024 14:21:33 -0000	1.39
++++ audio/openal-soft/Makefile	30 Jul 2024 18:56:34 -0000
+@@ -54,6 +54,14 @@ SUBST_SED.oss=		-e 's,/dev/dsp,${DEVOSSA
+ 
+ .include "options.mk"
+ 
++# On glibc 2.17, <unistd.h> includes <getopt.h>, and it happens to be
++# a (conflicting) local copy if we keep it
++# NB: getopt usage is already removed in openal-soft HEAD sources.
++pre-build:
++	if grep -q '^#define HAVE_GETOPT$$' ${WRKSRC}/${CMAKE_BUILD_DIR}/config.h; then \
++		${RM} -f ${WRKSRC}/utils/getopt.[ch]; \
++	fi
++
+ post-install:
+ 	${RM} ${DESTDIR}${PREFIX}/include/AL/al.h.orig
+ 

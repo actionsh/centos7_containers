@@ -1,0 +1,11 @@
+diff -p -u -r1.55 Makefile
+--- databases/tdb/Makefile	30 Jul 2024 11:52:19 -0000	1.55
++++ databases/tdb/Makefile	30 Jul 2024 23:06:50 -0000
+@@ -43,6 +43,7 @@ SUBST_FILES.docbook+=	buildtools/wafsamb
+ SUBST_STAGE.docbook=	pre-configure
+ SUBST_SED.docbook+=	-e 's,http://docbook.sourceforge.net/release/xsl/current,${PREFIX}/share/xsl/docbook,g'
+ 
++.include "../../devel/gettext-lib/buildlink3.mk"
+ .include "../../lang/python/application.mk"
+ .include "../../lang/python/extension.mk"
+ .include "../../mk/bsd.pkg.mk"
